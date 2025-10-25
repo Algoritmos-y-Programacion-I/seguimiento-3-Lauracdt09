@@ -19,13 +19,6 @@ public class SchoolApp {
         controller = new SchoolController("Computaricemos");
     }
 
-    /*
-     * ATENCION !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-     * El siguiente metodo esta incompleto.
-     * Agregue la logica necesaria (instrucciones) para satisfacer los
-     * requerimientos
-     */
-
     public void menu() {
 
         System.out.println("\n Bienvenido a Computaricemos");
@@ -75,15 +68,11 @@ public class SchoolApp {
         int piso = input.nextInt();
         input.nextLine();
 
-        System.out.println("Ingrese la columna (1-10): ");
-        int columna = input.nextInt();
-        input.nextLine();
-
         System.out.println("¿Está cerca de una ventana (true/false)?");
         boolean nextWindow = input.nextBoolean();
         input.nextLine();
 
-        controller.agregarComputador(serialNumber, piso, nextWindow, columna);
+        controller.agregarComputador(serialNumber, piso, nextWindow);
     }
 
     public void registrarIncidenteEnComputador() {
@@ -102,7 +91,17 @@ public class SchoolApp {
         System.out.println("Ingrese la descripción del incidente: ");
         String description = input.nextLine();
 
-        controller.agregarIncidenteEnComputador(serialNumber, piso, columna, description);       
+        System.out.print("El incidente ya esta resuelto (true/false): ");
+        boolean resuelto = input.nextBoolean();
+        input.nextLine();
+
+        int horas = 0;
+        if (resuelto) {
+            System.out.print("Cuantas horas tomó resolver el incidente: ");
+            horas = input.nextInt();
+            input.nextLine();
+        }
+        controller.agregarIncidenteEnComputador(serialNumber, piso, columna, description, resuelto, horas);       
     }
 
     public void consultarComputadorConMasIncidentes() {

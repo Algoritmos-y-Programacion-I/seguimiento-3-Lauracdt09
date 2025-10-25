@@ -45,7 +45,7 @@ public class SchoolController {
      * válida y esté disponible antes de registrar el computador.
      * 
      * Precondición:
-     * Los parámetros piso y columna deben encontrarse dentro de los rangos válidos.
+     * El parámetro piso debe encontrarse dentro de los rangos válidos.
      * El número de serial no debe existir previamente en la matriz de computadores.
      * 
      * Postcondición:
@@ -56,11 +56,10 @@ public class SchoolController {
      * @param serialNumber es el número serial del computador, que no debe existir previamente.
      * @param piso es el piso del edificio de computadores que debe estar dentro del rango válido (1-5).
      * @param nextWindow indica si el computador está cerca de una ventana (true = sí, false = no)
-     * @param columna es el columna del piso del edificio de computadores que debe estar dentro del rango válido (1-10)
      * @return boolean, true si el computador fue agregado exitosamente;
      * false si el número de serie ya existe, la posición es inválida o el espacio ya está ocupado.
      */
-    public boolean agregarComputador(String serialNumber, int piso, boolean nextWindow, int columna) {
+    public boolean agregarComputador(String serialNumber, int piso, boolean nextWindow) {
         if (searchSerial(serialNumber) != null){
             System.out.println("⚠︎ No puede agregar un computador, el número serial " + serialNumber + " ya existe.");
             return false;
@@ -69,32 +68,28 @@ public class SchoolController {
             System.out.println("⚠︎ El piso que desea registrar no existe");
             return false;
         }
-        if (columna < 1 || columna > 10){
-            System.out.println("⚠︎ La columna que desea registrar no existe");
-            return false;
-        }
         int indicePiso = piso - 1;
-        int indiceColumna = columna -1;
-        
-        if (estructuraComputadores [indicePiso][indiceColumna] != null) {
-            System.out.println("⚠︎ Esta posición ya está ocupada (piso " + piso + " columna " + columna + ")");           
-            return false;
+        for (int j = 0; j < 10; j++) {
+            if (estructuraComputadores[indicePiso][j] == null) {
+                Computer newComputer = new Computer(serialNumber, nextWindow);
+                estructuraComputadores[indicePiso][j] = newComputer;
+                System.out.println("Computador agregado exitosamente en Piso " + piso + ", Columna " + (j + 1));
+                return true;
+            }
         }
-
-        Computer newComputer = new Computer (serialNumber, nextWindow);
-        estructuraComputadores [indicePiso][indiceColumna] = newComputer;
-        System.out.println("✔ El computador fue agregado exitosamente en el piso " + piso + ", y la columna " + (indiceColumna + 1));
-        return true;
+        
+        System.out.println(" ⚠︎ Error: No hay espacio disponible en el piso " + piso);
+        return false;
     }
 
     /**
      * Descripción:
      * Este método analizador busca un computador por su número de serie escaneando la matriz de estructura de computadores.
      * 
-     * Precondicion:
+     * Precondición:
      * no debe ser null el numero serial.
      * 
-     * Postcondicion:
+     * Postcondición:
      * no modifica el estado del sistema. Devuelve la referencia al computador cuyo serial coincide 
      * o null si no se encuentra.
      * 
@@ -115,28 +110,35 @@ public class SchoolController {
     }
 
     /**
-     * Este método modificador registra un nuevo método para el computador ubicado en la pocisión indicada
+     * Este método modificador registra un nuevo incidente para el computador ubicado en la pocisión indicada
      * (piso, columna), validando que la ubicación sea válida, que exista un computador en esa celda de la matriz 
      * y que el serial ingresado corresponda con el del computador almacenado. 
+     * Si el incidente se marca resuelto registra las horas de solución y actualiza el acumulado de las mismas.
      * 
      * Precondición:
      * Debe existir un computador en estructura computadores [piso -1][columna-1] y su serial debe coincidir con 
      * serialNumber. 
      * Se asume que description no es nula ni vacía.
+     * Si resuelto es true, entonces horas debe ser >= 0 y el total acumulado no puede superar 100.
      * 
      * Postcondición:
      * Se agrega un objeto Incident con fecha actual y la descripción dada a la lista de incidentes del computador. 
-     * El tamaño de dicha lista aumenta en 1. Si alguna validación falla, no se realizan cambios.
+     * El tamaño de dicha lista aumenta en 1.
+     * Si resuelto es true, el incidente queda marcado como solucionado, se registran las horas en solutionHours
+     * y se incrementa hourSpentSupport en horas.
+     * Si alguna validación falla, no se realizan cambios
      * 
      * @param serialNumber es el número serial que debe coincidir con el computador en la ubicación indicada.
      * @param piso es el piso del edificio de computadores que debe estar dentro del rango válido (1-5).
      * @param columna es el columna del piso del edificio de computadores que debe estar dentro del rango válido (1-10).
      * @param description es la descripción del incidente reportado.
+     * @param resuelto indica si el incidente fue solucionado.
+     * @param horas horas de solucion a registrar
      * @return boolean true si el incidente fue agregado; false si la ubicación es inválida, no hay computador registrado
      * o el serial no coincide.
      */
 
-    public boolean agregarIncidenteEnComputador(String serialNumber, int piso, int columna, String description) {
+    public boolean agregarIncidenteEnComputador(String serialNumber, int piso, int columna, String description, boolean resuelto, int horas) {
         if (piso < 1 || piso > 5 || columna < 1 || columna > 10) {
             System.out.println("⚠︎ La ubicación es inválida");
             return false;
@@ -151,11 +153,25 @@ public class SchoolController {
             System.out.println("⚠︎ El numero serial ingresado no corresponde al computador seleccionado");
             return false;
         }
-
+        if (resuelto && horas > 0) {
+        if (hourSpentSupport + horas > 100) {
+            System.out.println("⚠︎ Error: Se excederia el limite de 100 horas de soporte");
+            System.out.println("Horas disponibles: " + (100 - hourSpentSupport));
+            return false;
+        }
+    }
         Incident newIncident = new Incident(LocalDate.now(), description);
+        if (resuelto) {
+            newIncident.setSolution(true);
+            newIncident.setSolutionHours(horas);
+            hourSpentSupport += horas;
+        }
         computer.addIncident(newIncident);
         
         System.out.println("✔ El incidente fue reportado exitosamente");
+        if (resuelto) {
+            System.out.println("Horas de soporte gastadas: " + hourSpentSupport + "/100");
+        }
         return true;
     }
 
@@ -165,7 +181,7 @@ public class SchoolController {
      * un reporte con sus datos (incluye ubicación y detalle de incidentes).
      * 
      * Precondición: ninguna
-     * Postcondición: modifica el estado del sistema. Imprime en consola el reporte.
+     * Postcondición: no modifica el estado del sistema. Imprime en consola el reporte.
      * Si no hay computadores registrados, imprime un mensaje informativo y finaliza.
      * 
      */
@@ -208,6 +224,4 @@ public class SchoolController {
         }
     }
     }
-
-
 }

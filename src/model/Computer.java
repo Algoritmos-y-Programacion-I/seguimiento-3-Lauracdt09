@@ -44,8 +44,8 @@ public class Computer {
     
     @Override
     public String toString() {
-        return "Computador con serial = " + serialNumber + "', cerca de la ventana= " + nextWindow +
-               ", #incidentes= " + incidents.size() + "";
+        return "Computador con serial = " + serialNumber + " , cerca de la ventana= " + nextWindow +
+               ", #incidentes= " + incidents.size();
     }
 
 }
