@@ -1,19 +1,13 @@
 package ui;
 
 import java.util.Scanner;
+import model.SchoolController;
 
 public class SchoolApp {
-
-    /*
-     * ATENCION !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-     * Agregue los atributos (relaciones) necesarios para conectar esta clase con el
-     * modelo.
-     */
-
+    private SchoolController controller;
     private Scanner input;
 
     public static void main(String[] args) {
-
         SchoolApp ui = new SchoolApp();
         ui.menu();
 
@@ -22,6 +16,7 @@ public class SchoolApp {
     // Constructor
     public SchoolApp() {
         input = new Scanner(System.in);
+        controller = new SchoolController("Computaricemos");
     }
 
     /*
@@ -33,7 +28,7 @@ public class SchoolApp {
 
     public void menu() {
 
-        System.out.println("Bienvenido a Computaricemos");
+        System.out.println("\n Bienvenido a Computaricemos");
 
         int option = 0;
         do {
@@ -44,7 +39,9 @@ public class SchoolApp {
             System.out.println("2) Registrar incidente en computador");
             System.out.println("3) Consultar el computador con más incidentes");
             System.out.println("0) Salir del sistema");
+            System.out.print("Opción: ");
             option = input.nextInt();
+            input.nextLine();
 
             switch (option) {
                 case 1:
@@ -60,31 +57,56 @@ public class SchoolApp {
                     System.out.println("\nGracias por usar nuestros servicios. Adios!");
                     break;
                 default:
-                    System.out.println("\nOpcion invalida. Intente nuevamente.");
+                    System.out.println("\nOpción inválida. Intente nuevamente.");
                     break;
             }
 
         } while (option != 0);
+        input.close();
 
     }
 
-    /*
-     * ATENCION !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-     * Los siguientes metodos estan incompletos.
-     * Agregue la logica necesaria (instrucciones) para satisfacer los
-     * requerimientos
-     */
-
     public void registrarComputador() {
+        System.out.println("\n--- REGISTRAR COMPUTADOR ---");
+        System.out.println("Ingrese el número serial: ");
+        String serialNumber = input.nextLine();
 
+        System.out.println("Ingrese el piso (1-5): ");
+        int piso = input.nextInt();
+        input.nextLine();
+
+        System.out.println("Ingrese la columna (1-10): ");
+        int columna = input.nextInt();
+        input.nextLine();
+
+        System.out.println("¿Está cerca de una ventana (true/false)?");
+        boolean nextWindow = input.nextBoolean();
+        input.nextLine();
+
+        controller.agregarComputador(serialNumber, piso, nextWindow, columna);
     }
 
     public void registrarIncidenteEnComputador() {
+        System.out.println("\n --- REGISTRAR INCIDENTE EN COMPUTADOR ---");
+        System.out.print("Ingrese el número serial: ");
+        String serialNumber = input.nextLine();
 
+        System.out.println("Ingrese el piso (1-5): ");
+        int piso = input.nextInt();
+        input.nextLine();
+
+        System.out.println("Ingrese la columna (1-10): ");
+        int columna = input.nextInt();
+        input.nextLine();
+
+        System.out.println("Ingrese la descripción del incidente: ");
+        String description = input.nextLine();
+
+        controller.agregarIncidenteEnComputador(serialNumber, piso, columna, description);       
     }
 
     public void consultarComputadorConMasIncidentes() {
-
+        controller.getComputerList();
     }
 
 }
